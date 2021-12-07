@@ -3,6 +3,8 @@ from sklearn import metrics
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
 
+import matplotlib
+
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
@@ -26,6 +28,40 @@ values = wine_df
 
 train_features, test_features, train_targets, test_targets = train_test_split(values, target_data, test_size=0.2)
 
+
+def quality_values(target_data, values):
+    x = target_data
+    y = values['alcohol']
+
+    # Normalized data to allow for more accurate gradients
+    y_max = y.max()
+    normalized_y = y / y_max
+
+    plt.scatter(x, normalized_y)
+
+    z = np.polyfit(x, normalized_y, 1)
+    p = np.poly1d(z)
+    plt.plot(x, p(x), "r--")
+
+    print(z)
+
+    plt.title("Alcohol: Gradient = " + str(round(z[0], 3)))
+    plt.ylabel("Normalised Alcohol")
+    plt.xlabel("Quality")
+    plt.show()
+
+
+# fixed acidity = small positive correlation = 0.017
+# volatile acidity = negative correlation = -0.055
+# citric acid = positive correlation = 0.055
+# residual sugar = very small positive correlation, outliers = 0.002
+# chlorides = very small negative correlation, outliers = -0.012
+# free sulfur dioxide = very large negative correlation = -0.009
+# total sulfur dioxide = very large negative correlation, notable outliers = -0.026
+# density = small negative correlation = 0.0
+# pH = very small negative correlation, some outliers = -0.003
+# sulphates = positive correlation, many outliers = 0.026
+# alcohol = strong positive correlation = 0.042
 
 def CNN(train_features, test_features, train_targets, test_targets, values, target_data):
     classes_num = 10
@@ -76,8 +112,10 @@ def MLPModel(train_features, test_features, train_targets, test_targets):
     predictions = classifier.predict(test_features)
     score = np.round(metrics.accuracy_score(test_targets, predictions), 2)
     print("Mean accuracy of predictions: " + str(score))
-    
+
 
 # MLPModel(train_features, test_features, train_targets, test_targets)
 
-CNN(train_features, test_features, train_targets, test_targets, values, target_data)
+# CNN(train_features, test_features, train_targets, test_targets, values, target_data)
+
+quality_values(target_data, values)
